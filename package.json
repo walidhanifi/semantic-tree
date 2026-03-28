@@ -1,0 +1,29 @@
+{
+  "name": "software-engineer-test",
+  "version": "1.0.0",
+  "description": "Please read these instructions in full before commencing the challenge.",
+  "main": "index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/walidhanifi/shorthand-test.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/walidhanifi/shorthand-test/issues"
+  },
+  "homepage": "https://github.com/walidhanifi/shorthand-test#readme",
+  "devDependencies": {
+    "@types/node": "^25.5.0",
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.2"
+  },
+  "type": "module"
+}
