@@ -24,8 +24,10 @@ const $ = load(htmlFromREADME);
 
 const htmlHeadings = $("h1, h2, h3, h4, h5, h6");
 
-const headings = [];
+const semanticTree = [];
 const stack = [];
+
+const skippedLevels = [];
 
 for (const header of htmlHeadings) {
   const headerTag = header.name;
@@ -41,13 +43,28 @@ for (const header of htmlHeadings) {
   // pop stack until we find a parent with a smaller level
   while (stack.length > 0) {
     const topLevel = parseInt(stack.at(-1).tag.charAt(1));
-    if (topLevel < curLevel) break;
+    const levelDiff = curLevel - topLevel;
+    if (levelDiff > 0) {
+      if (levelDiff > 1) {
+        skippedLevels.push(
+          {
+            tag: stack.at(-1).tag,
+            content: stack.at(-1).content,
+          },
+          {
+            tag: headerTag,
+            content: headerText,
+          },
+        );
+      }
+      break;
+    }
     stack.pop();
   }
 
   // check if root
   if (stack.length === 0) {
-    headings.push(node);
+    semanticTree.push(node);
   } else {
     stack.at(-1).children.push(node);
   }
@@ -55,4 +72,5 @@ for (const header of htmlHeadings) {
   stack.push(node);
 }
 
-console.dir(headings, { depth: null });
+console.dir(semanticTree, { depth: null });
+console.log(skippedLevels);
