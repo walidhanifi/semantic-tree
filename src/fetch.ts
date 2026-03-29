@@ -9,6 +9,7 @@ export class FetchError extends Error {
   }
 }
 
+/** Validates that a string is a well formed HTTP or HTTPS URL */
 export function isValidUrl(url: string): boolean {
   try {
     const parsed = new URL(url);
@@ -18,6 +19,7 @@ export function isValidUrl(url: string): boolean {
   }
 }
 
+/** Fetches HTML from a URL with timeout and content-type validation */
 export async function fetchHTML(url: string) {
   const response = await fetch(url, {
     signal: AbortSignal.timeout(10000),

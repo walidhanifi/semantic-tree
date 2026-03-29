@@ -22,7 +22,6 @@ describe("extractStructure", () => {
     ]);
   });
   it("should create siblings at the same level", () => {
-    // siblings are headings on the same level
     const headings: Heading[] = [
       { tag: "h2", content: "some guy", depth: 0 },
       { tag: "h2", content: "some guys sibling", depth: 0 },

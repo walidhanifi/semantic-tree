@@ -2,6 +2,7 @@ import { load } from "cheerio";
 import type { Heading, HeadingNode, ParsingResult } from "./type.js";
 import { parseHeadingLevel } from "./utils.js";
 
+/** Builds a semantic tree from a flat heading array and detects skipped levels */
 export function extractStructure(headings: Heading[]): {
   semanticTree: HeadingNode[];
   skippedLevels: [HeadingNode, HeadingNode][];
@@ -53,6 +54,7 @@ export function extractStructure(headings: Heading[]): {
   return { semanticTree, skippedLevels };
 }
 
+/** Detects headings whose level conflicts with their section nesting depth */
 export function checkIncongruence(headings: Heading[]): HeadingNode[] {
   const incongruentHeadings: HeadingNode[] = [];
   let prevDepth = 0;
@@ -74,6 +76,7 @@ export function checkIncongruence(headings: Heading[]): HeadingNode[] {
   return incongruentHeadings;
 }
 
+/** Parses HTML and returns semantic structure, skipped levels, and incongruent headings */
 export function parseHTML(html: string): ParsingResult {
   const $ = load(html);
   const sectionSelector = "section, article, nav, aside, div";
