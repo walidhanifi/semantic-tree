@@ -74,3 +74,21 @@ for (const header of htmlHeadings) {
 
 console.dir(semanticTree, { depth: null });
 console.log(skippedLevels);
+
+const sectionContent = "section, article, nav, aside";
+
+const incongruentHeadings = [];
+
+for (const header of htmlHeadings) {
+  const depth = $(header).parents(sectionContent).length;
+
+  const headerTag = parseInt(header.tagName.charAt(1));
+
+  if (depth !== headerTag) {
+    incongruentHeadings.push({
+      tag: header.tagName,
+      content: $(header).text(),
+    });
+  }
+}
+console.log(incongruentHeadings);
