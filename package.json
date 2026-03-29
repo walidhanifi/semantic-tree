@@ -22,6 +22,7 @@
   },
   "homepage": "https://github.com/walidhanifi/shorthand-test#readme",
   "devDependencies": {
+    "@types/express": "^5.0.6",
     "@types/node": "^25.5.0",
     "tsx": "^4.21.0",
     "typescript": "^6.0.2",
@@ -29,6 +30,7 @@
   },
   "type": "module",
   "dependencies": {
-    "cheerio": "^1.2.0"
+    "cheerio": "^1.2.0",
+    "express": "^5.2.1"
   }
 }
