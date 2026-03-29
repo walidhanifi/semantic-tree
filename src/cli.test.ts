@@ -19,9 +19,10 @@ describe("cli", () => {
   it("should exit 1 for invalid url", async () => {
     try {
       await exec("node", [CLI_PATH, "notaurl"]);
-    } catch (error: any) {
-      expect(error.stderr).toContain("Invalid URL");
-      expect(error.code).toBe(1);
+    } catch (error) {
+      const err = error as { stderr: string; code: number };
+      expect(err.stderr).toContain("Invalid URL");
+      expect(err.code).toBe(1);
     }
   });
 

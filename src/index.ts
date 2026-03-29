@@ -1,4 +1,4 @@
-import { load, type CheerioAPI } from "cheerio";
+import { load } from "cheerio";
 import type { Heading, HeadingNode, ParsingResult } from "./type.js";
 import { parseHeadingLevel } from "./utils.js";
 
