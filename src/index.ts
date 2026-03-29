@@ -76,7 +76,7 @@ export function checkIncongruence(headings: Heading[]): HeadingNode[] {
 
 export function parseHTML(html: string): ParsingResult {
   const $ = load(html);
-  const sectionSelector = "section, article, nav, aside";
+  const sectionSelector = "section, article, nav, aside, div";
   const htmlHeadings = $("h1, h2, h3, h4, h5, h6");
 
   const headings: Heading[] = [];
