@@ -25,5 +25,8 @@
     "tsx": "^4.21.0",
     "typescript": "^6.0.2"
   },
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "cheerio": "^1.2.0"
+  }
 }
