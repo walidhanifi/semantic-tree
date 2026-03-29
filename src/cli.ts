@@ -1,3 +1,4 @@
+import { FetchError, fetchHTML, isValidUrl } from "./fetch.js";
 import { parseHTML } from "./index.js";
 
 async function main() {
@@ -8,25 +9,28 @@ async function main() {
     process.exit(1);
   }
 
-  try {
-    new URL(url);
-  } catch {
+  if (!isValidUrl(url)) {
     console.error(`Invalid URL: ${url}`);
     process.exit(1);
   }
 
   try {
-    const response = await fetch(url);
-    if (!response.ok) {
-      console.error(`Failed to fetch: HTTP ${response.status}`);
-      process.exit(1);
-    }
-    const html = await response.text();
+    const html = await fetchHTML(url);
     const result = parseHTML(html);
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
+    if (error instanceof DOMException && error.name === "TimeoutError") {
+      console.error("Request timed out after 10 seconds");
+      process.exit(1);
+    }
+
+    if (error instanceof FetchError) {
+      console.error(error.message);
+      process.exit(1);
+    }
+
     console.error(
-      `Failed to fetch: ${error instanceof Error ? error.message : String(error)}`,
+      `Unexpected error: ${error instanceof Error ? error.message : String(error)}`,
     );
     process.exit(1);
   }
