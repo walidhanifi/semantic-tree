@@ -22,6 +22,37 @@ const htmlFromREADME = `
 
 const $ = load(htmlFromREADME);
 
-const output = $("h1,h2,h3,h4,h5,h6").text();
+const htmlHeadings = $("h1, h2, h3, h4, h5, h6");
 
-console.log(output); // TODO: will remove later, just for testing library
+const headings = [];
+const stack = [];
+
+for (const header of htmlHeadings) {
+  const headerTag = header.name;
+  const headerText = $(header).text();
+  const curLevel = parseInt(headerTag.charAt(1));
+
+  const node = {
+    tag: headerTag,
+    content: headerText,
+    children: [],
+  };
+
+  // pop stack until we find a parent with a smaller level
+  while (stack.length > 0) {
+    const topLevel = parseInt(stack.at(-1).tag.charAt(1));
+    if (topLevel < curLevel) break;
+    stack.pop();
+  }
+
+  // check if root
+  if (stack.length === 0) {
+    headings.push(node);
+  } else {
+    stack.at(-1).children.push(node);
+  }
+
+  stack.push(node);
+}
+
+console.dir(headings, { depth: null });
