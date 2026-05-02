@@ -37,6 +37,7 @@ describe("buildAuditResponse", () => {
       fetchedAt: "2026-05-02T03:00:00.000Z",
       fetchDurationMs: 42,
       mode: "rendered",
+      cacheStatus: "miss",
       headingCounts: {
         total: 2,
         skippedLevelPairs: 1,

@@ -133,6 +133,7 @@ The tool returns JSON with four top-level keys:
     "fetchedAt": "2026-05-02T03:00:00.000Z",
     "fetchDurationMs": 42,
     "mode": "static",
+    "cacheStatus": "miss",
     "headingCounts": {
       "total": 3,
       "skippedLevelPairs": 0,
@@ -184,5 +185,6 @@ JavaScript-rendered pages can be fetched through Playwright with `--render js` i
 The repo includes CI in [`.github/workflows/ci.yml`](./.github/workflows/ci.yml) covering build, lint, and test steps on push and pull request.
 
 The HTTP service also exposes a lightweight `/health` endpoint and writes one JSON log line per request to stdout.
+Repeated URL requests are cached in memory for a short TTL, and the API applies a simple in-memory per-IP rate limit.
 
 Near-term work is tracked in [TODO.md](./TODO.md), with the main focus on broader rule coverage, packaging, and better real-world fixtures.

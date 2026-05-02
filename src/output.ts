@@ -8,6 +8,7 @@ export interface AuditMetadata {
   fetchedAt: string;
   fetchDurationMs: number;
   mode: ResponseMode;
+  cacheStatus: "hit" | "miss";
   headingCounts: {
     total: number;
     skippedLevelPairs: number;
@@ -37,6 +38,7 @@ export function buildAuditResponse(
     sourceUrl: string;
     fetchDurationMs: number;
     mode: ResponseMode;
+    cacheStatus?: "hit" | "miss";
   },
 ): AuditResponse {
   return {
@@ -46,6 +48,7 @@ export function buildAuditResponse(
       fetchedAt: new Date().toISOString(),
       fetchDurationMs: options.fetchDurationMs,
       mode: options.mode,
+      cacheStatus: options.cacheStatus || "miss",
       headingCounts: {
         total: countHeadings(result["semantic-structure"]),
         skippedLevelPairs: result["skipped-levels"].length,

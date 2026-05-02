@@ -7,9 +7,18 @@ vi.mock("./render.js", () => ({
 
 import { app } from "./server.js";
 import { renderPageHTML } from "./render.js";
+import {
+  clearRateLimitStore,
+  clearResponseCache,
+} from "./server-runtime.js";
 
 afterEach(() => {
   vi.restoreAllMocks();
+  clearResponseCache();
+  clearRateLimitStore();
+  delete process.env.CACHE_TTL_MS;
+  delete process.env.RATE_LIMIT_MAX;
+  delete process.env.RATE_LIMIT_WINDOW_MS;
 });
 
 describe("server", () => {
@@ -117,5 +126,44 @@ describe("server", () => {
     expect(payload.path).toBe("/");
     expect(payload.status).toBe(200);
     expect(payload.durationMs).toEqual(expect.any(Number));
+  });
+
+  it("should cache repeated requests for the same url and mode", async () => {
+    const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValue(
+      new Response("<main><h1>Home</h1></main>", {
+        status: 200,
+        headers: { "content-type": "text/html; charset=utf-8" },
+      }),
+    );
+
+    const first = await request(app).get("/?u=https://example.com");
+    const second = await request(app).get("/?u=https://example.com");
+
+    expect(first.status).toBe(200);
+    expect(second.status).toBe(200);
+    expect(first.headers["x-cache"]).toBe("MISS");
+    expect(second.headers["x-cache"]).toBe("HIT");
+    expect(second.body.metadata.cacheStatus).toBe("hit");
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it("should rate limit repeated requests from the same client", async () => {
+    process.env.RATE_LIMIT_MAX = "1";
+    process.env.RATE_LIMIT_WINDOW_MS = "60000";
+
+    vi.spyOn(global, "fetch").mockResolvedValue(
+      new Response("<main><h1>Home</h1></main>", {
+        status: 200,
+        headers: { "content-type": "text/html; charset=utf-8" },
+      }),
+    );
+
+    const first = await request(app).get("/?u=https://example.com/one");
+    const second = await request(app).get("/?u=https://example.com/two");
+
+    expect(first.status).toBe(200);
+    expect(second.status).toBe(429);
+    expect(second.body.error).toBe("Rate limit exceeded");
+    expect(second.headers["x-ratelimit-remaining"]).toBe("0");
   });
 });

@@ -95,6 +95,7 @@ async function main() {
       sourceUrl: url,
       fetchDurationMs: Date.now() - startedAt,
       mode: toResponseMode(renderMode),
+      cacheStatus: "miss",
     });
 
     if (format === "html") {

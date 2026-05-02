@@ -4,6 +4,7 @@ import { parseHTML } from "./index.js";
 import { FetchError, fetchHTML, isValidUrl } from "./fetch.js";
 import { buildAuditResponse, toJson, type JsonFormat } from "./output.js";
 import { renderHTMLReport } from "./report.js";
+import { getCachedHTML, setCachedHTML, takeRateLimitSlot } from "./server-runtime.js";
 
 export const app = express();
 const port = parseInt(process.env.PORT || "8000", 10);
@@ -23,12 +24,13 @@ app.use((req, res, next) => {
     console.log(
       JSON.stringify({
         timestamp: new Date().toISOString(),
-        method: req.method,
-        path: req.path,
-        status: res.statusCode,
-        durationMs: Date.now() - startedAt,
-      }),
-    );
+      method: req.method,
+      path: req.path,
+      status: res.statusCode,
+      durationMs: Date.now() - startedAt,
+      cacheStatus: res.locals.cacheStatus || "skip",
+    }),
+  );
   });
 
   next();
@@ -65,13 +67,42 @@ app.get("/", async (req, res) => {
   }
 
   try {
+    const rateLimit = takeRateLimitSlot(req.ip || "unknown");
+    res.setHeader("X-RateLimit-Remaining", String(rateLimit.remaining));
+    res.setHeader(
+      "X-RateLimit-Reset",
+      new Date(rateLimit.resetAt).toISOString(),
+    );
+
+    if (!rateLimit.allowed) {
+      res.status(429).json({
+        url,
+        error: "Rate limit exceeded",
+        status: 429,
+      });
+      return;
+    }
+
     const startedAt = Date.now();
-    const html = await fetchHTML(url, { mode });
+    const cacheKey = `${mode}:${url}`;
+    let html = getCachedHTML(cacheKey);
+    let cacheStatus: "hit" | "miss" = "hit";
+
+    if (!html) {
+      cacheStatus = "miss";
+      html = await fetchHTML(url, { mode });
+      setCachedHTML(cacheKey, html);
+    }
+
+    res.locals.cacheStatus = cacheStatus;
+    res.setHeader("X-Cache", cacheStatus.toUpperCase());
+
     const result = parseHTML(html);
     const response = buildAuditResponse(result, {
       sourceUrl: url,
       fetchDurationMs: Date.now() - startedAt,
       mode,
+      cacheStatus,
     });
 
     if (format === "html") {

@@ -13,7 +13,7 @@ This repository is being developed as a focused HTML heading-structure tool. The
 ## Product Improvements
 
 - [x] Support JavaScript-rendered pages via Playwright while keeping the core parser transport-agnostic
-- [ ] Add request caching and basic rate limiting to the HTTP service
+- [x] Add request caching and basic rate limiting to the HTTP service
 - [x] Expose a health endpoint and structured logs for deployment
 - [x] Add a simple HTML report mode for non-technical reviewers
 - [ ] Benchmark large documents and reduce repeated DOM traversal where possible
