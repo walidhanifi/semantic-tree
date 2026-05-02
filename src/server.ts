@@ -1,12 +1,14 @@
 import express from "express";
 import { parseHTML } from "./index.js";
 import { FetchError, fetchHTML, isValidUrl } from "./fetch.js";
+import { renderHTMLReport } from "./report.js";
 
 export const app = express();
 const port = parseInt(process.env.PORT || "8000", 10);
 
 app.get("/", async (req, res) => {
   const url = req.query.u as string;
+  const format = req.query.format === "html" ? "html" : "json";
 
   if (!url) {
     res.status(400).json({
@@ -28,6 +30,12 @@ app.get("/", async (req, res) => {
   try {
     const html = await fetchHTML(url);
     const result = parseHTML(html);
+
+    if (format === "html") {
+      res.type("html").send(renderHTMLReport(result, { sourceUrl: url }));
+      return;
+    }
+
     res.json(result);
   } catch (error) {
     if (error instanceof DOMException && error.name === "TimeoutError") {

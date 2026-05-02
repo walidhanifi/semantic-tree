@@ -26,6 +26,12 @@ Run the CLI against a page:
 node dist/cli.js https://www.bbc.com
 ```
 
+Render an HTML report from the CLI:
+
+```bash
+node dist/cli.js https://www.bbc.com --report html > report.html
+```
+
 Run the HTTP API locally:
 
 ```bash
@@ -36,6 +42,12 @@ Then request:
 
 ```text
 http://localhost:8000?u=https://www.bbc.com
+```
+
+Or request the HTML report directly:
+
+```text
+http://localhost:8000?u=https://www.bbc.com&format=html
 ```
 
 Run the test suite:
@@ -96,6 +108,7 @@ The tool returns JSON with three top-level keys:
 3. A stack-based pass builds the semantic heading tree and records skipped levels.
 4. A second pass compares heading rank against container depth to flag incongruent headings.
 5. A small warnings pass reports missing `h1`, multiple top-level `h1`s, and empty headings.
+6. An optional report renderer turns the audit output into a simple HTML summary.
 
 The parsing logic is isolated from the transport layer, so the same core functions power both the CLI and the HTTP endpoint.
 

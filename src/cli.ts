@@ -1,11 +1,39 @@
 import { FetchError, fetchHTML, isValidUrl } from "./fetch.js";
 import { parseHTML } from "./index.js";
+import { renderHTMLReport } from "./report.js";
+
+type ReportFormat = "json" | "html";
+
+function parseArgs(args: string[]): { url?: string; format: ReportFormat } {
+  let url: string | undefined;
+  let format: ReportFormat = "json";
+
+  for (let index = 0; index < args.length; index += 1) {
+    const arg = args[index];
+    if (!arg) continue;
+
+    if (arg === "--report") {
+      const value = args[index + 1];
+      if (value === "html" || value === "json") {
+        format = value;
+        index += 1;
+      }
+      continue;
+    }
+
+    if (!arg.startsWith("--") && !url) {
+      url = arg;
+    }
+  }
+
+  return url ? { url, format } : { format };
+}
 
 async function main() {
-  const url = process.argv[2];
+  const { url, format } = parseArgs(process.argv.slice(2));
 
   if (!url) {
-    console.error("Usage: checkheadings <url>");
+    console.error("Usage: heading-audit <url> [--report html|json]");
     process.exit(1);
   }
 
@@ -17,6 +45,12 @@ async function main() {
   try {
     const html = await fetchHTML(url);
     const result = parseHTML(html);
+
+    if (format === "html") {
+      console.log(renderHTMLReport(result, { sourceUrl: url }));
+      return;
+    }
+
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     if (error instanceof DOMException && error.name === "TimeoutError") {

@@ -1,6 +1,10 @@
-import { describe, it, expect } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import request from "supertest";
 import { app } from "./server.js";
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 describe("server", () => {
   it("should return 400 when url is missing", async () => {
@@ -32,5 +36,23 @@ describe("server", () => {
     );
 
     expect(response.status).toBe(502);
+  });
+
+  it("should render an html report when requested", async () => {
+    vi.spyOn(global, "fetch").mockResolvedValue(
+      new Response("<main><h1>Home</h1><h2>Intro</h2></main>", {
+        status: 200,
+        headers: { "content-type": "text/html; charset=utf-8" },
+      }),
+    );
+
+    const response = await request(app).get(
+      "/?u=https://example.com&format=html",
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.headers["content-type"]).toContain("text/html");
+    expect(response.text).toContain("Heading Audit Report");
+    expect(response.text).toContain("https://example.com");
   });
 });
