@@ -1,8 +1,16 @@
 {
-  "name": "software-engineer-test",
+  "name": "heading-audit",
   "version": "1.0.0",
-  "description": "Please read these instructions in full before commencing the challenge.",
-  "main": "index.js",
+  "description": "CLI and HTTP API for auditing heading structure and semantic nesting in HTML pages.",
+  "main": "dist/index.js",
+  "bin": {
+    "heading-audit": "dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "TODO.md"
+  ],
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
@@ -13,17 +21,27 @@
     "format": "prettier --write src/",
     "format:check": "prettier --check src/"
   },
+  "keywords": [
+    "accessibility",
+    "seo",
+    "html",
+    "audit",
+    "headings",
+    "typescript"
+  ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/walidhanifi/shorthand-test.git"
+    "url": "git+https://github.com/walidhanifi/heading-audit.git"
   },
-  "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/walidhanifi/shorthand-test/issues"
+    "url": "https://github.com/walidhanifi/heading-audit/issues"
   },
-  "homepage": "https://github.com/walidhanifi/shorthand-test#readme",
+  "homepage": "https://github.com/walidhanifi/heading-audit#readme",
+  "engines": {
+    "node": ">=22"
+  },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@types/express": "^5.0.6",
