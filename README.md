@@ -5,6 +5,7 @@ Heading Audit is a small TypeScript utility for inspecting the heading structure
 - the semantic heading outline inferred from `h1` to `h6`
 - skipped heading levels such as `h2` to `h4`
 - headings whose rank conflicts with their structural nesting in the page
+- a compact warnings list for common heading hygiene issues
 
 This is useful for accessibility reviews, content QA, SEO checks, CMS migrations, and HTML normalization pipelines.
 
@@ -77,6 +78,13 @@ The tool returns JSON with three top-level keys:
   ],
   "incongruent-headings": [
     { "tag": "h2", "content": "Out-of-place heading" }
+  ],
+  "warnings": [
+    {
+      "rule": "missing-h1",
+      "message": "Document does not contain an h1 heading",
+      "headings": []
+    }
   ]
 }
 ```
@@ -87,6 +95,7 @@ The tool returns JSON with three top-level keys:
 2. Headings are collected in document order with their text content and structural depth.
 3. A stack-based pass builds the semantic heading tree and records skipped levels.
 4. A second pass compares heading rank against container depth to flag incongruent headings.
+5. A small warnings pass reports missing `h1`, multiple top-level `h1`s, and empty headings.
 
 The parsing logic is isolated from the transport layer, so the same core functions power both the CLI and the HTTP endpoint.
 

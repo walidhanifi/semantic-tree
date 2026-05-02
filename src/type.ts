@@ -10,8 +10,15 @@ export interface HeadingNode {
   children?: HeadingNode[]; // ommitted as per README for nodes that don't have it
 }
 
+export interface AuditWarning {
+  rule: "missing-h1" | "multiple-top-level-h1" | "empty-headings";
+  message: string;
+  headings: HeadingNode[];
+}
+
 export interface ParsingResult {
   "semantic-structure": HeadingNode[];
   "skipped-levels": [HeadingNode, HeadingNode][];
   "incongruent-headings": HeadingNode[];
+  warnings: AuditWarning[];
 }

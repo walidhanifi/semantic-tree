@@ -20,7 +20,7 @@ This repository is being developed as a focused HTML heading-audit tool. The ite
 
 ## Audit Rules
 
-- [ ] Add optional warnings for missing `h1`, multiple top-level `h1`s, and empty headings
+- [x] Add optional warnings for missing `h1`, multiple top-level `h1`s, and empty headings
 - [ ] Flag headings hidden from assistive technologies or generated from empty wrappers
 - [ ] Distinguish informational warnings from high-confidence structural errors
 - [ ] Allow rule toggles so teams can adapt the audit to their own editorial standards

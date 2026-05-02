@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { checkIncongruence, extractStructure, parseHTML } from "./index.js";
+import {
+  checkIncongruence,
+  collectWarnings,
+  extractStructure,
+  parseHTML,
+} from "./index.js";
 import type { Heading } from "./type.js";
 
 // unit tests
@@ -246,7 +251,67 @@ describe("checkIncongruence", () => {
   });
 });
 
-// integration test —> i.e. HTML string in, full JSON out
+describe("collectWarnings", () => {
+  it("should warn when the document has no h1", () => {
+    const headings: Heading[] = [{ tag: "h2", content: "Section", depth: 0 }];
+    const { semanticTree } = extractStructure(headings);
+
+    const result = collectWarnings(headings, semanticTree);
+
+    expect(result).toStrictEqual([
+      {
+        rule: "missing-h1",
+        message: "Document does not contain an h1 heading",
+        headings: [],
+      },
+    ]);
+  });
+
+  it("should warn when multiple top-level h1 headings exist", () => {
+    const headings: Heading[] = [
+      { tag: "h1", content: "First", depth: 0 },
+      { tag: "h1", content: "Second", depth: 0 },
+    ];
+    const { semanticTree } = extractStructure(headings);
+
+    const result = collectWarnings(headings, semanticTree);
+
+    expect(result).toStrictEqual([
+      {
+        rule: "multiple-top-level-h1",
+        message: "Document contains multiple top-level h1 headings",
+        headings: [
+          { tag: "h1", content: "First" },
+          { tag: "h1", content: "Second" },
+        ],
+      },
+    ]);
+  });
+
+  it("should warn when empty headings are present", () => {
+    const headings: Heading[] = [
+      { tag: "h1", content: "Title", depth: 0 },
+      { tag: "h2", content: "", depth: 1 },
+      { tag: "h3", content: "", depth: 2 },
+    ];
+    const { semanticTree } = extractStructure(headings);
+
+    const result = collectWarnings(headings, semanticTree);
+
+    expect(result).toStrictEqual([
+      {
+        rule: "empty-headings",
+        message: "Document contains headings with no text content",
+        headings: [
+          { tag: "h2", content: "" },
+          { tag: "h3", content: "" },
+        ],
+      },
+    ]);
+  });
+});
+
+// integration test, HTML string in and full JSON out
 describe("parseHTML", () => {
   it("should return empty arr's for no loaded HTML headings", () => {
     const html = `
@@ -266,6 +331,13 @@ describe("parseHTML", () => {
       "semantic-structure": [],
       "skipped-levels": [],
       "incongruent-headings": [],
+      warnings: [
+        {
+          rule: "missing-h1",
+          message: "Document does not contain an h1 heading",
+          headings: [],
+        },
+      ],
     };
 
     const result = parseHTML(html);
@@ -296,6 +368,7 @@ describe("parseHTML", () => {
       ],
       "skipped-levels": [],
       "incongruent-headings": [],
+      warnings: [],
     };
 
     const result = parseHTML(html);
@@ -323,9 +396,6 @@ describe("parseHTML", () => {
 </section>
 `;
 
-    //! IMPORTANT NOTE: the spec uses the word tuple for skipped levels but the example output is flat
-    //! i have implemented tuples [[prev, current], ...] as this matches the spec requirements, with the assumption that output needs adjustment
-    //! sent an email just to touch base and confirm this
     const readmeOutput = {
       "semantic-structure": [
         {
@@ -361,10 +431,41 @@ describe("parseHTML", () => {
       "incongruent-headings": [
         { tag: "h2", content: "An out of place Heading 2" },
       ],
+      warnings: [],
     };
 
     const result = parseHTML(readmeHTML);
 
     expect(result).toStrictEqual(readmeOutput);
+  });
+
+  it("should include warnings for empty headings and multiple top-level h1s", () => {
+    const html = `
+<main>
+  <h1>Overview</h1>
+  <h1>Overview copy</h1>
+  <section>
+    <h2> </h2>
+  </section>
+</main>
+`;
+
+    const result = parseHTML(html);
+
+    expect(result.warnings).toStrictEqual([
+      {
+        rule: "multiple-top-level-h1",
+        message: "Document contains multiple top-level h1 headings",
+        headings: [
+          { tag: "h1", content: "Overview" },
+          { tag: "h1", content: "Overview copy" },
+        ],
+      },
+      {
+        rule: "empty-headings",
+        message: "Document contains headings with no text content",
+        headings: [{ tag: "h2", content: "" }],
+      },
+    ]);
   });
 });

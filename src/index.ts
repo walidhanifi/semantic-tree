@@ -1,6 +1,18 @@
 import { load } from "cheerio";
-import type { Heading, HeadingNode, ParsingResult } from "./type.js";
+import type {
+  AuditWarning,
+  Heading,
+  HeadingNode,
+  ParsingResult,
+} from "./type.js";
 import { parseHeadingLevel } from "./utils.js";
+
+function toHeadingNode(heading: Heading): HeadingNode {
+  return {
+    tag: heading.tag,
+    content: heading.content,
+  };
+}
 
 /** Builds a semantic tree from a flat heading array and detects skipped levels */
 export function extractStructure(headings: Heading[]): {
@@ -76,6 +88,48 @@ export function checkIncongruence(headings: Heading[]): HeadingNode[] {
   return incongruentHeadings;
 }
 
+export function collectWarnings(
+  headings: Heading[],
+  semanticTree: HeadingNode[],
+): AuditWarning[] {
+  const warnings: AuditWarning[] = [];
+
+  const hasH1 = headings.some((heading) => heading.tag === "h1");
+  if (!hasH1) {
+    warnings.push({
+      rule: "missing-h1",
+      message: "Document does not contain an h1 heading",
+      headings: [],
+    });
+  }
+
+  const topLevelH1s = semanticTree.filter((node) => node.tag === "h1");
+  if (topLevelH1s.length > 1) {
+    warnings.push({
+      rule: "multiple-top-level-h1",
+      message: "Document contains multiple top-level h1 headings",
+      headings: topLevelH1s.map((heading) => ({
+        tag: heading.tag,
+        content: heading.content,
+      })),
+    });
+  }
+
+  const emptyHeadings = headings
+    .filter((heading) => heading.content.length === 0)
+    .map(toHeadingNode);
+
+  if (emptyHeadings.length > 0) {
+    warnings.push({
+      rule: "empty-headings",
+      message: "Document contains headings with no text content",
+      headings: emptyHeadings,
+    });
+  }
+
+  return warnings;
+}
+
 /** Parses HTML and returns semantic structure, skipped levels, and incongruent headings */
 export function parseHTML(html: string): ParsingResult {
   const $ = load(html);
@@ -93,10 +147,12 @@ export function parseHTML(html: string): ParsingResult {
 
   const { semanticTree, skippedLevels } = extractStructure(headings);
   const incongruentHeadings = checkIncongruence(headings);
+  const warnings = collectWarnings(headings, semanticTree);
 
   return {
     "semantic-structure": semanticTree,
     "skipped-levels": skippedLevels,
     "incongruent-headings": incongruentHeadings,
+    warnings,
   };
 }
