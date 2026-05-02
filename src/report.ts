@@ -118,7 +118,7 @@ export function renderHTMLReport(
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Heading Audit Report</title>
+    <title>Semantic Tree Report</title>
     <style>
       :root {
         color-scheme: light;
@@ -219,7 +219,7 @@ export function renderHTMLReport(
     <main>
       <header>
         <p class="eyebrow">Static HTML heading analysis</p>
-        <h1>Heading Audit Report</h1>
+        <h1>Semantic Tree Report</h1>
         ${sourceUrl}
       </header>
 

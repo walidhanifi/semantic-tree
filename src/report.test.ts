@@ -27,7 +27,7 @@ describe("renderHTMLReport", () => {
       sourceUrl: "https://example.com?a=1&b=2",
     });
 
-    expect(html).toContain("<title>Heading Audit Report</title>");
+    expect(html).toContain("<title>Semantic Tree Report</title>");
     expect(html).toContain("Landing &lt;title&gt;");
     expect(html).toContain("https://example.com?a=1&amp;b=2");
     expect(html).toContain("Skipped levels");

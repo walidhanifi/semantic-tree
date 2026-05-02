@@ -2,7 +2,7 @@
   "semantic-structure": [
     {
       "tag": "h1",
-      "content": "Heading Audit",
+      "content": "Semantic Tree",
       "children": [
         {
           "tag": "h2",
@@ -36,7 +36,7 @@
       "headings": [
         {
           "tag": "h1",
-          "content": "Heading Audit"
+          "content": "Semantic Tree"
         },
         {
           "tag": "h1",

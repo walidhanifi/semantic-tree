@@ -54,7 +54,7 @@ async function main() {
 
   if (!url) {
     console.error(
-      "Usage: heading-audit <url> [--report html|json] [--render js]",
+      "Usage: semantic-tree <url> [--report html|json] [--render js]",
     );
     process.exit(1);
   }

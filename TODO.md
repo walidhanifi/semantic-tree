@@ -1,10 +1,10 @@
 # Roadmap
 
-This repository is being developed as a focused HTML heading-audit tool. The items below are the next practical steps for making it more useful beyond the current static-page MVP.
+This repository is being developed as a focused HTML heading-structure tool. The items below are the next practical steps for making it more useful beyond the current static-page MVP.
 
 ## Near Term
 
-- [ ] Package the CLI properly so it can be installed and invoked as `heading-audit`
+- [ ] Package the CLI properly so it can be installed and invoked as `semantic-tree`
 - [x] Add fixture coverage for messy real-world documents from docs sites, blogs, and marketing pages
 - [ ] Expand incongruence detection to catch more edge cases around sibling sections and repeated heading resets
 - [ ] Return optional metadata such as source URL, fetch duration, and heading counts

@@ -1,10 +1,10 @@
 {
-  "name": "heading-audit",
+  "name": "semantic-tree",
   "version": "1.0.0",
   "description": "CLI and HTTP API for auditing heading structure and semantic nesting in HTML pages.",
   "main": "dist/index.js",
   "bin": {
-    "heading-audit": "dist/cli.js"
+    "semantic-tree": "dist/cli.js"
   },
   "files": [
     "dist",
@@ -32,14 +32,14 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/walidhanifi/heading-audit.git"
+    "url": "git+https://github.com/walidhanifi/semantic-tree.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/walidhanifi/heading-audit/issues"
+    "url": "https://github.com/walidhanifi/semantic-tree/issues"
   },
-  "homepage": "https://github.com/walidhanifi/heading-audit#readme",
+  "homepage": "https://github.com/walidhanifi/semantic-tree#readme",
   "engines": {
     "node": ">=22"
   },

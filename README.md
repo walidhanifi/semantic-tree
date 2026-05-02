@@ -1,6 +1,6 @@
-# Heading Audit
+# Semantic Tree
 
-Heading Audit is a small TypeScript utility for inspecting the heading structure of any static HTML page. It can be used as a CLI tool or as a lightweight HTTP service to surface three things in one pass:
+Semantic Tree is a small TypeScript utility for inspecting the heading structure of any static HTML page. It can be used as a CLI tool or as a lightweight HTTP service to surface three things in one pass:
 
 - the semantic heading outline inferred from `h1` to `h6`
 - skipped heading levels such as `h2` to `h4`

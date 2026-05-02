@@ -58,7 +58,7 @@ describe("server", () => {
 
     expect(response.status).toBe(200);
     expect(response.headers["content-type"]).toContain("text/html");
-    expect(response.text).toContain("Heading Audit Report");
+    expect(response.text).toContain("Semantic Tree Report");
     expect(response.text).toContain("https://example.com");
   });
 
