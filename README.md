@@ -210,6 +210,7 @@ Overall complexity is `O(n x d)`.
 - `src/server.ts`: Express server entrypoint
 - `src/*.test.ts`: unit and integration coverage
 - `fixtures/`: saved HTML samples and expected outputs for broader regression coverage
+- `examples/`: small published sample outputs for quick inspection
 
 ## Current Limitations
 
@@ -225,5 +226,6 @@ The repo includes CI in [`.github/workflows/ci.yml`](./.github/workflows/ci.yml)
 
 The HTTP service also exposes a lightweight `/health` endpoint and writes one JSON log line per request to stdout.
 Repeated URL requests are cached in memory for a short TTL, and the API applies a simple in-memory per-IP rate limit.
+Contribution guidance and rule-design notes live in [CONTRIBUTING.md](./CONTRIBUTING.md). Example outputs live in [examples/README.md](./examples/README.md).
 
 Near-term work is tracked in [TODO.md](./TODO.md), with the main focus on broader rule coverage, packaging, and better real-world fixtures.

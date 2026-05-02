@@ -27,7 +27,7 @@ This repository is being developed as a focused HTML heading-structure tool. The
 
 ## Developer Experience
 
-- [ ] Publish example outputs and fixture snapshots
+- [x] Publish example outputs and fixture snapshots
 - [x] Add npm scripts for coverage and watch mode
 - [x] Add a Dockerfile for quick local or cloud deployment
-- [ ] Write contribution guidelines and rule-design notes
+- [x] Write contribution guidelines and rule-design notes
