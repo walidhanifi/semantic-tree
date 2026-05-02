@@ -16,6 +16,31 @@ function toJsonFormat(prettyQuery: unknown): JsonFormat {
   return prettyQuery === "1" || prettyQuery === "true" ? "pretty" : "compact";
 }
 
+app.use((req, res, next) => {
+  const startedAt = Date.now();
+
+  res.on("finish", () => {
+    console.log(
+      JSON.stringify({
+        timestamp: new Date().toISOString(),
+        method: req.method,
+        path: req.path,
+        status: res.statusCode,
+        durationMs: Date.now() - startedAt,
+      }),
+    );
+  });
+
+  next();
+});
+
+app.get("/health", (_req, res) => {
+  res.json({
+    status: "ok",
+    uptimeSeconds: Math.round(process.uptime()),
+  });
+});
+
 app.get("/", async (req, res) => {
   const url = req.query.u as string;
   const format = req.query.format === "html" ? "html" : "json";

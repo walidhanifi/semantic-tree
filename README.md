@@ -68,6 +68,12 @@ Or request the HTML report directly:
 http://localhost:8000?u=https://www.bbc.com&format=html
 ```
 
+Health checks are available at:
+
+```text
+http://localhost:8000/health
+```
+
 For JavaScript-rendered pages:
 
 ```text
@@ -176,5 +182,7 @@ JavaScript-rendered pages can be fetched through Playwright with `--render js` i
 ## Development Notes
 
 The repo includes CI in [`.github/workflows/ci.yml`](./.github/workflows/ci.yml) covering build, lint, and test steps on push and pull request.
+
+The HTTP service also exposes a lightweight `/health` endpoint and writes one JSON log line per request to stdout.
 
 Near-term work is tracked in [TODO.md](./TODO.md), with the main focus on broader rule coverage, packaging, and better real-world fixtures.

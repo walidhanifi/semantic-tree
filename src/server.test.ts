@@ -13,6 +13,14 @@ afterEach(() => {
 });
 
 describe("server", () => {
+  it("should return health status", async () => {
+    const response = await request(app).get("/health");
+
+    expect(response.status).toBe(200);
+    expect(response.body.status).toBe("ok");
+    expect(response.body.uptimeSeconds).toEqual(expect.any(Number));
+  });
+
   it("should return 400 when url is missing", async () => {
     const response = await request(app).get("/");
 
@@ -88,5 +96,26 @@ describe("server", () => {
 
     expect(response.status).toBe(200);
     expect(response.text).toContain('\n  "semantic-structure"');
+  });
+
+  it("should log requests as structured json", async () => {
+    const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+    vi.spyOn(global, "fetch").mockResolvedValue(
+      new Response("<main><h1>Home</h1></main>", {
+        status: 200,
+        headers: { "content-type": "text/html; charset=utf-8" },
+      }),
+    );
+
+    const response = await request(app).get("/?u=https://example.com");
+
+    expect(response.status).toBe(200);
+    expect(logSpy).toHaveBeenCalled();
+
+    const payload = JSON.parse(logSpy.mock.calls.at(-1)?.[0] as string);
+    expect(payload.method).toBe("GET");
+    expect(payload.path).toBe("/");
+    expect(payload.status).toBe(200);
+    expect(payload.durationMs).toEqual(expect.any(Number));
   });
 });
