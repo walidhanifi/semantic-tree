@@ -3,9 +3,18 @@ import type {
   AuditWarning,
   Heading,
   HeadingNode,
+  ParseOptions,
   ParsingResult,
+  WarningRule,
 } from "./type.js";
 import { parseHeadingLevel } from "./utils.js";
+
+const defaultWarningRules: WarningRule[] = [
+  "missing-h1",
+  "multiple-top-level-h1",
+  "empty-headings",
+  "hidden-headings",
+];
 
 function toHeadingNode(heading: Heading): HeadingNode {
   return {
@@ -91,11 +100,15 @@ export function checkIncongruence(headings: Heading[]): HeadingNode[] {
 export function collectWarnings(
   headings: Heading[],
   semanticTree: HeadingNode[],
+  options: ParseOptions = {},
 ): AuditWarning[] {
   const warnings: AuditWarning[] = [];
+  const enabledWarnings = new Set(
+    options.enabledWarnings || defaultWarningRules,
+  );
 
   const hasH1 = headings.some((heading) => heading.tag === "h1");
-  if (!hasH1) {
+  if (!hasH1 && enabledWarnings.has("missing-h1")) {
     warnings.push({
       rule: "missing-h1",
       message: "Document does not contain an h1 heading",
@@ -104,7 +117,10 @@ export function collectWarnings(
   }
 
   const topLevelH1s = semanticTree.filter((node) => node.tag === "h1");
-  if (topLevelH1s.length > 1) {
+  if (
+    topLevelH1s.length > 1 &&
+    enabledWarnings.has("multiple-top-level-h1")
+  ) {
     warnings.push({
       rule: "multiple-top-level-h1",
       message: "Document contains multiple top-level h1 headings",
@@ -119,7 +135,7 @@ export function collectWarnings(
     .filter((heading) => heading.content.length === 0)
     .map(toHeadingNode);
 
-  if (emptyHeadings.length > 0) {
+  if (emptyHeadings.length > 0 && enabledWarnings.has("empty-headings")) {
     warnings.push({
       rule: "empty-headings",
       message: "Document contains headings with no text content",
@@ -127,27 +143,49 @@ export function collectWarnings(
     });
   }
 
+  const hiddenHeadings = headings
+    .filter((heading) => heading.isHidden)
+    .map(toHeadingNode);
+
+  if (hiddenHeadings.length > 0 && enabledWarnings.has("hidden-headings")) {
+    warnings.push({
+      rule: "hidden-headings",
+      message: "Document contains headings hidden from assistive technologies or visual layout",
+      headings: hiddenHeadings,
+    });
+  }
+
   return warnings;
 }
 
 /** Parses HTML and returns semantic structure, skipped levels, and incongruent headings */
-export function parseHTML(html: string): ParsingResult {
+export function parseHTML(html: string, options: ParseOptions = {}): ParsingResult {
   const $ = load(html);
   const sectionSelector = "section, article, nav, aside, div";
   const htmlHeadings = $("h1, h2, h3, h4, h5, h6");
 
   const headings: Heading[] = [];
   for (const header of htmlHeadings) {
+    const element = $(header);
+    const style = element.attr("style") || "";
+    const normalizedStyle = style.replaceAll(/\s+/g, "").toLowerCase();
+    const isHidden =
+      element.attr("hidden") !== undefined ||
+      element.attr("aria-hidden") === "true" ||
+      normalizedStyle.includes("display:none") ||
+      normalizedStyle.includes("visibility:hidden");
+
     headings.push({
       tag: header.tagName,
-      content: $(header).text().trim(),
-      depth: $(header).parents(sectionSelector).length,
+      content: element.text().trim(),
+      depth: element.parents(sectionSelector).length,
+      isHidden,
     });
   }
 
   const { semanticTree, skippedLevels } = extractStructure(headings);
   const incongruentHeadings = checkIncongruence(headings);
-  const warnings = collectWarnings(headings, semanticTree);
+  const warnings = collectWarnings(headings, semanticTree, options);
 
   return {
     "semantic-structure": semanticTree,

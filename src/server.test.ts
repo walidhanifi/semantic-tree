@@ -91,6 +91,32 @@ describe("server", () => {
     expect(renderPageHTML).toHaveBeenCalledWith("https://example.com");
   });
 
+  it("should allow warning rules to be selected through the query string", async () => {
+    vi.spyOn(global, "fetch").mockResolvedValue(
+      new Response("<main><h2 hidden>Only hidden</h2></main>", {
+        status: 200,
+        headers: { "content-type": "text/html; charset=utf-8" },
+      }),
+    );
+
+    const response = await request(app).get(
+      "/?u=https://example.com&rules=hidden-headings",
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.body.warnings).toStrictEqual([
+      {
+        rule: "hidden-headings",
+        message:
+          "Document contains headings hidden from assistive technologies or visual layout",
+        headings: [{ tag: "h2", content: "Only hidden" }],
+      },
+    ]);
+    expect(response.body.metadata.rules.enabledWarnings).toStrictEqual([
+      "hidden-headings",
+    ]);
+  });
+
   it("should pretty print json when requested", async () => {
     vi.spyOn(global, "fetch").mockResolvedValue(
       new Response("<main><h1>Home</h1></main>", {

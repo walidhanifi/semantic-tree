@@ -38,6 +38,12 @@ Switch JSON output between pretty and compact formatting:
 node dist/cli.js https://www.bbc.com --format compact
 ```
 
+Limit which warning rules run:
+
+```bash
+node dist/cli.js https://www.bbc.com --rules missing-h1,empty-headings
+```
+
 Render an HTML report from the CLI:
 
 ```bash
@@ -66,6 +72,12 @@ Or request the HTML report directly:
 
 ```text
 http://localhost:8000?u=https://www.bbc.com&format=html
+```
+
+Limit warning rules on the API:
+
+```text
+http://localhost:8000?u=https://www.bbc.com&rules=missing-h1,hidden-headings
 ```
 
 Health checks are available at:
@@ -139,6 +151,14 @@ The tool returns JSON with four top-level keys:
       "skippedLevelPairs": 0,
       "incongruent": 0,
       "warnings": 1
+    },
+    "rules": {
+      "enabledWarnings": [
+        "missing-h1",
+        "multiple-top-level-h1",
+        "empty-headings",
+        "hidden-headings"
+      ]
     }
   }
 }

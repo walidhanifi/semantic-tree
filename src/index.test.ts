@@ -309,6 +309,45 @@ describe("collectWarnings", () => {
       },
     ]);
   });
+
+  it("should warn when headings are hidden", () => {
+    const headings: Heading[] = [
+      { tag: "h1", content: "Title", depth: 0 },
+      { tag: "h2", content: "Hidden block", depth: 1, isHidden: true },
+    ];
+    const { semanticTree } = extractStructure(headings);
+
+    const result = collectWarnings(headings, semanticTree);
+
+    expect(result).toStrictEqual([
+      {
+        rule: "hidden-headings",
+        message:
+          "Document contains headings hidden from assistive technologies or visual layout",
+        headings: [{ tag: "h2", content: "Hidden block" }],
+      },
+    ]);
+  });
+
+  it("should respect enabled warning rules", () => {
+    const headings: Heading[] = [
+      { tag: "h2", content: "", depth: 0, isHidden: true },
+    ];
+    const { semanticTree } = extractStructure(headings);
+
+    const result = collectWarnings(headings, semanticTree, {
+      enabledWarnings: ["hidden-headings"],
+    });
+
+    expect(result).toStrictEqual([
+      {
+        rule: "hidden-headings",
+        message:
+          "Document contains headings hidden from assistive technologies or visual layout",
+        headings: [{ tag: "h2", content: "" }],
+      },
+    ]);
+  });
 });
 
 // integration test, HTML string in and full JSON out
@@ -465,6 +504,49 @@ describe("parseHTML", () => {
         rule: "empty-headings",
         message: "Document contains headings with no text content",
         headings: [{ tag: "h2", content: "" }],
+      },
+    ]);
+  });
+
+  it("should detect hidden headings in html", () => {
+    const html = `
+<main>
+  <h1>Overview</h1>
+  <h2 hidden>Hidden for layout</h2>
+  <h3 aria-hidden="true">Screen-reader hidden</h3>
+</main>
+`;
+
+    const result = parseHTML(html);
+
+    expect(result.warnings).toContainEqual({
+      rule: "hidden-headings",
+      message:
+        "Document contains headings hidden from assistive technologies or visual layout",
+      headings: [
+        { tag: "h2", content: "Hidden for layout" },
+        { tag: "h3", content: "Screen-reader hidden" },
+      ],
+    });
+  });
+
+  it("should allow warning rules to be narrowed at parse time", () => {
+    const html = `
+<main>
+  <h2 hidden>Only one warning should remain</h2>
+</main>
+`;
+
+    const result = parseHTML(html, {
+      enabledWarnings: ["hidden-headings"],
+    });
+
+    expect(result.warnings).toStrictEqual([
+      {
+        rule: "hidden-headings",
+        message:
+          "Document contains headings hidden from assistive technologies or visual layout",
+        headings: [{ tag: "h2", content: "Only one warning should remain" }],
       },
     ]);
   });

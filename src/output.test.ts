@@ -38,6 +38,9 @@ describe("buildAuditResponse", () => {
       fetchDurationMs: 42,
       mode: "rendered",
       cacheStatus: "miss",
+      rules: {
+        enabledWarnings: [],
+      },
       headingCounts: {
         total: 2,
         skippedLevelPairs: 1,

@@ -5,9 +5,16 @@ import { FetchError, fetchHTML, isValidUrl } from "./fetch.js";
 import { buildAuditResponse, toJson, type JsonFormat } from "./output.js";
 import { renderHTMLReport } from "./report.js";
 import { getCachedHTML, setCachedHTML, takeRateLimitSlot } from "./server-runtime.js";
+import type { WarningRule } from "./type.js";
 
 export const app = express();
 const port = parseInt(process.env.PORT || "8000", 10);
+const warningRules: WarningRule[] = [
+  "missing-h1",
+  "multiple-top-level-h1",
+  "empty-headings",
+  "hidden-headings",
+];
 
 function toFetchMode(renderQuery: unknown): FetchMode {
   return renderQuery === "js" ? "rendered" : "static";
@@ -15,6 +22,19 @@ function toFetchMode(renderQuery: unknown): FetchMode {
 
 function toJsonFormat(prettyQuery: unknown): JsonFormat {
   return prettyQuery === "1" || prettyQuery === "true" ? "pretty" : "compact";
+}
+
+function parseWarningRules(value: unknown): WarningRule[] | undefined {
+  if (typeof value !== "string" || value.length === 0) return;
+
+  const rules = value
+    .split(",")
+    .map((part) => part.trim())
+    .filter((part): part is WarningRule =>
+      warningRules.includes(part as WarningRule),
+    );
+
+  return rules.length > 0 ? rules : undefined;
 }
 
 app.use((req, res, next) => {
@@ -48,6 +68,7 @@ app.get("/", async (req, res) => {
   const format = req.query.format === "html" ? "html" : "json";
   const mode = toFetchMode(req.query.render);
   const jsonFormat = toJsonFormat(req.query.pretty);
+  const enabledWarnings = parseWarningRules(req.query.rules);
 
   if (!url) {
     res.status(400).json({
@@ -97,12 +118,16 @@ app.get("/", async (req, res) => {
     res.locals.cacheStatus = cacheStatus;
     res.setHeader("X-Cache", cacheStatus.toUpperCase());
 
-    const result = parseHTML(html);
+    const result = parseHTML(
+      html,
+      enabledWarnings ? { enabledWarnings } : {},
+    );
     const response = buildAuditResponse(result, {
       sourceUrl: url,
       fetchDurationMs: Date.now() - startedAt,
       mode,
       cacheStatus,
+      enabledWarnings: enabledWarnings || warningRules,
     });
 
     if (format === "html") {

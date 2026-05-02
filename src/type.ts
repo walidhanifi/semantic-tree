@@ -2,6 +2,7 @@ export interface Heading {
   tag: string;
   content: string;
   depth: number;
+  isHidden?: boolean;
 }
 
 export interface HeadingNode {
@@ -10,8 +11,18 @@ export interface HeadingNode {
   children?: HeadingNode[]; // ommitted as per README for nodes that don't have it
 }
 
+export type WarningRule =
+  | "missing-h1"
+  | "multiple-top-level-h1"
+  | "empty-headings"
+  | "hidden-headings";
+
+export interface ParseOptions {
+  enabledWarnings?: WarningRule[];
+}
+
 export interface AuditWarning {
-  rule: "missing-h1" | "multiple-top-level-h1" | "empty-headings";
+  rule: WarningRule;
   message: string;
   headings: HeadingNode[];
 }

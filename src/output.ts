@@ -1,4 +1,4 @@
-import type { ParsingResult } from "./type.js";
+import type { ParsingResult, WarningRule } from "./type.js";
 
 export type JsonFormat = "pretty" | "compact";
 export type ResponseMode = "static" | "rendered";
@@ -9,6 +9,9 @@ export interface AuditMetadata {
   fetchDurationMs: number;
   mode: ResponseMode;
   cacheStatus: "hit" | "miss";
+  rules: {
+    enabledWarnings: WarningRule[];
+  };
   headingCounts: {
     total: number;
     skippedLevelPairs: number;
@@ -39,6 +42,7 @@ export function buildAuditResponse(
     fetchDurationMs: number;
     mode: ResponseMode;
     cacheStatus?: "hit" | "miss";
+    enabledWarnings?: WarningRule[];
   },
 ): AuditResponse {
   return {
@@ -49,6 +53,9 @@ export function buildAuditResponse(
       fetchDurationMs: options.fetchDurationMs,
       mode: options.mode,
       cacheStatus: options.cacheStatus || "miss",
+      rules: {
+        enabledWarnings: options.enabledWarnings || [],
+      },
       headingCounts: {
         total: countHeadings(result["semantic-structure"]),
         skippedLevelPairs: result["skipped-levels"].length,

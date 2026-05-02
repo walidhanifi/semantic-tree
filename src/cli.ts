@@ -8,20 +8,42 @@ import {
   type ResponseMode,
 } from "./output.js";
 import { renderHTMLReport } from "./report.js";
+import type { WarningRule } from "./type.js";
 
 type ReportFormat = "json" | "html";
 type RenderMode = "static" | "js";
+const warningRules: WarningRule[] = [
+  "missing-h1",
+  "multiple-top-level-h1",
+  "empty-headings",
+  "hidden-headings",
+];
+
+function parseWarningRules(value: string | undefined): WarningRule[] | undefined {
+  if (!value) return;
+
+  const rules = value
+    .split(",")
+    .map((part) => part.trim())
+    .filter((part): part is WarningRule =>
+      warningRules.includes(part as WarningRule),
+    );
+
+  return rules.length > 0 ? rules : undefined;
+}
 
 function parseArgs(args: string[]): {
   url?: string;
   format: ReportFormat;
   jsonFormat: JsonFormat;
   renderMode: RenderMode;
+  enabledWarnings?: WarningRule[];
 } {
   let url: string | undefined;
   let format: ReportFormat = "json";
   let jsonFormat: JsonFormat = "pretty";
   let renderMode: RenderMode = "static";
+  let enabledWarnings: WarningRule[] | undefined;
 
   for (let index = 0; index < args.length; index += 1) {
     const arg = args[index];
@@ -54,14 +76,31 @@ function parseArgs(args: string[]): {
       continue;
     }
 
+    if (arg === "--rules") {
+      enabledWarnings = parseWarningRules(args[index + 1]);
+      if (args[index + 1]) index += 1;
+      continue;
+    }
+
     if (!arg.startsWith("--") && !url) {
       url = arg;
     }
   }
 
   return url
-    ? { url, format, jsonFormat, renderMode }
-    : { format, jsonFormat, renderMode };
+    ? {
+        url,
+        format,
+        jsonFormat,
+        renderMode,
+        ...(enabledWarnings ? { enabledWarnings } : {}),
+      }
+    : {
+        format,
+        jsonFormat,
+        renderMode,
+        ...(enabledWarnings ? { enabledWarnings } : {}),
+      };
 }
 
 function toFetchMode(renderMode: RenderMode): FetchMode {
@@ -73,11 +112,13 @@ function toResponseMode(renderMode: RenderMode): ResponseMode {
 }
 
 async function main() {
-  const { url, format, jsonFormat, renderMode } = parseArgs(process.argv.slice(2));
+  const { url, format, jsonFormat, renderMode, enabledWarnings } = parseArgs(
+    process.argv.slice(2),
+  );
 
   if (!url) {
     console.error(
-      "Usage: semantic-tree <url> [--report html|json] [--format pretty|compact] [--render js]",
+      "Usage: semantic-tree <url> [--report html|json] [--format pretty|compact] [--render js] [--rules csv]",
     );
     process.exit(1);
   }
@@ -90,12 +131,16 @@ async function main() {
   try {
     const startedAt = Date.now();
     const html = await fetchHTML(url, { mode: toFetchMode(renderMode) });
-    const result = parseHTML(html);
+    const result = parseHTML(
+      html,
+      enabledWarnings ? { enabledWarnings } : {},
+    );
     const response = buildAuditResponse(result, {
       sourceUrl: url,
       fetchDurationMs: Date.now() - startedAt,
       mode: toResponseMode(renderMode),
       cacheStatus: "miss",
+      enabledWarnings: enabledWarnings || warningRules,
     });
 
     if (format === "html") {
