@@ -1,0 +1,47 @@
+{
+  "semantic-structure": [
+    {
+      "tag": "h1",
+      "content": "Shaping a content audit workflow",
+      "children": [
+        {
+          "tag": "h2",
+          "content": "Start with the outline",
+          "children": [
+            {
+              "tag": "h3",
+              "content": "Capture what is there"
+            }
+          ]
+        },
+        {
+          "tag": "h2",
+          "content": "Fix the biggest breaks first"
+        },
+        {
+          "tag": "h2",
+          "content": ""
+        }
+      ]
+    }
+  ],
+  "skipped-levels": [],
+  "incongruent-headings": [
+    {
+      "tag": "h2",
+      "content": "Fix the biggest breaks first"
+    }
+  ],
+  "warnings": [
+    {
+      "rule": "empty-headings",
+      "message": "Document contains headings with no text content",
+      "headings": [
+        {
+          "tag": "h2",
+          "content": ""
+        }
+      ]
+    }
+  ]
+}

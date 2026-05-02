@@ -1,0 +1,44 @@
+{
+  "semantic-structure": [
+    {
+      "tag": "h1",
+      "content": "Accessibility review guide",
+      "children": [
+        {
+          "tag": "h2",
+          "content": "Why heading structure matters",
+          "children": [
+            {
+              "tag": "h3",
+              "content": "Assistive technology impact"
+            }
+          ]
+        },
+        {
+          "tag": "h2",
+          "content": "Common mistakes",
+          "children": [
+            {
+              "tag": "h4",
+              "content": "Skipping levels"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "skipped-levels": [
+    [
+      {
+        "tag": "h2",
+        "content": "Common mistakes"
+      },
+      {
+        "tag": "h4",
+        "content": "Skipping levels"
+      }
+    ]
+  ],
+  "incongruent-headings": [],
+  "warnings": []
+}

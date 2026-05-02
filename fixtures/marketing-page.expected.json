@@ -1,0 +1,48 @@
+{
+  "semantic-structure": [
+    {
+      "tag": "h1",
+      "content": "Heading Audit",
+      "children": [
+        {
+          "tag": "h2",
+          "content": "Ship cleaner content",
+          "children": [
+            {
+              "tag": "h3",
+              "content": "Spot skipped levels fast"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "tag": "h1",
+      "content": "Platform overview",
+      "children": [
+        {
+          "tag": "h2",
+          "content": "Bring your own URLs"
+        }
+      ]
+    }
+  ],
+  "skipped-levels": [],
+  "incongruent-headings": [],
+  "warnings": [
+    {
+      "rule": "multiple-top-level-h1",
+      "message": "Document contains multiple top-level h1 headings",
+      "headings": [
+        {
+          "tag": "h1",
+          "content": "Heading Audit"
+        },
+        {
+          "tag": "h1",
+          "content": "Platform overview"
+        }
+      ]
+    }
+  ]
+}

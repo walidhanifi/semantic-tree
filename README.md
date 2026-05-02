@@ -114,6 +114,7 @@ Overall complexity is `O(n x d)`.
 - `src/cli.ts`: command-line entrypoint
 - `src/server.ts`: Express server entrypoint
 - `src/*.test.ts`: unit and integration coverage
+- `fixtures/`: saved HTML samples and expected outputs for broader regression coverage
 
 ## Current Limitations
 
