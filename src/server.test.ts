@@ -34,6 +34,7 @@ describe("server", () => {
     expect(response.body).toHaveProperty("semantic-structure");
     expect(response.body).toHaveProperty("skipped-levels");
     expect(response.body).toHaveProperty("incongruent-headings");
+    expect(response.body).toHaveProperty("metadata");
   });
 
   it("should return 502 for unreachable host", async () => {
@@ -69,6 +70,23 @@ describe("server", () => {
 
     expect(response.status).toBe(200);
     expect(response.body).toHaveProperty("semantic-structure");
+    expect(response.body.metadata.mode).toBe("rendered");
     expect(renderPageHTML).toHaveBeenCalledWith("https://example.com");
+  });
+
+  it("should pretty print json when requested", async () => {
+    vi.spyOn(global, "fetch").mockResolvedValue(
+      new Response("<main><h1>Home</h1></main>", {
+        status: 200,
+        headers: { "content-type": "text/html; charset=utf-8" },
+      }),
+    );
+
+    const response = await request(app).get(
+      "/?u=https://example.com&pretty=1",
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.text).toContain('\n  "semantic-structure"');
   });
 });

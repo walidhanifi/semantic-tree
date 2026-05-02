@@ -7,8 +7,8 @@ This repository is being developed as a focused HTML heading-structure tool. The
 - [ ] Package the CLI properly so it can be installed and invoked as `semantic-tree`
 - [x] Add fixture coverage for messy real-world documents from docs sites, blogs, and marketing pages
 - [ ] Expand incongruence detection to catch more edge cases around sibling sections and repeated heading resets
-- [ ] Return optional metadata such as source URL, fetch duration, and heading counts
-- [ ] Add a small `--format` flag for compact JSON vs pretty output
+- [x] Return optional metadata such as source URL, fetch duration, and heading counts
+- [x] Add a small `--format` flag for compact JSON vs pretty output
 
 ## Product Improvements
 

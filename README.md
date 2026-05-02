@@ -32,6 +32,12 @@ Run the CLI against a page:
 node dist/cli.js https://www.bbc.com
 ```
 
+Switch JSON output between pretty and compact formatting:
+
+```bash
+node dist/cli.js https://www.bbc.com --format compact
+```
+
 Render an HTML report from the CLI:
 
 ```bash
@@ -84,7 +90,7 @@ Tested on Node 22.
 
 ## Response Shape
 
-The tool returns JSON with three top-level keys:
+The tool returns JSON with four top-level keys:
 
 ```json
 {
@@ -115,7 +121,19 @@ The tool returns JSON with three top-level keys:
       "message": "Document does not contain an h1 heading",
       "headings": []
     }
-  ]
+  ],
+  "metadata": {
+    "sourceUrl": "https://example.com",
+    "fetchedAt": "2026-05-02T03:00:00.000Z",
+    "fetchDurationMs": 42,
+    "mode": "static",
+    "headingCounts": {
+      "total": 3,
+      "skippedLevelPairs": 0,
+      "incongruent": 0,
+      "warnings": 1
+    }
+  }
 }
 ```
 

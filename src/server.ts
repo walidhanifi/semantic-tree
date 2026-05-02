@@ -2,6 +2,7 @@ import express from "express";
 import type { FetchMode } from "./fetch.js";
 import { parseHTML } from "./index.js";
 import { FetchError, fetchHTML, isValidUrl } from "./fetch.js";
+import { buildAuditResponse, toJson, type JsonFormat } from "./output.js";
 import { renderHTMLReport } from "./report.js";
 
 export const app = express();
@@ -11,10 +12,15 @@ function toFetchMode(renderQuery: unknown): FetchMode {
   return renderQuery === "js" ? "rendered" : "static";
 }
 
+function toJsonFormat(prettyQuery: unknown): JsonFormat {
+  return prettyQuery === "1" || prettyQuery === "true" ? "pretty" : "compact";
+}
+
 app.get("/", async (req, res) => {
   const url = req.query.u as string;
   const format = req.query.format === "html" ? "html" : "json";
   const mode = toFetchMode(req.query.render);
+  const jsonFormat = toJsonFormat(req.query.pretty);
 
   if (!url) {
     res.status(400).json({
@@ -34,15 +40,21 @@ app.get("/", async (req, res) => {
   }
 
   try {
+    const startedAt = Date.now();
     const html = await fetchHTML(url, { mode });
     const result = parseHTML(html);
+    const response = buildAuditResponse(result, {
+      sourceUrl: url,
+      fetchDurationMs: Date.now() - startedAt,
+      mode,
+    });
 
     if (format === "html") {
-      res.type("html").send(renderHTMLReport(result, { sourceUrl: url }));
+      res.type("html").send(renderHTMLReport(response, { sourceUrl: url }));
       return;
     }
 
-    res.json(result);
+    res.type("json").send(toJson(response, jsonFormat));
   } catch (error) {
     if (error instanceof DOMException && error.name === "TimeoutError") {
       res.status(504).json({
