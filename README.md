@@ -86,6 +86,13 @@ Health checks are available at:
 http://localhost:8000/health
 ```
 
+Build and run the container:
+
+```bash
+docker build -t semantic-tree .
+docker run --rm -p 8000:8000 semantic-tree
+```
+
 For JavaScript-rendered pages:
 
 ```text
@@ -96,6 +103,18 @@ Run the test suite:
 
 ```bash
 npm test
+```
+
+Run tests in watch mode:
+
+```bash
+npm run test:watch
+```
+
+Generate a coverage report:
+
+```bash
+npm run test:coverage
 ```
 
 Run linting:

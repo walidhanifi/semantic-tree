@@ -28,6 +28,6 @@ This repository is being developed as a focused HTML heading-structure tool. The
 ## Developer Experience
 
 - [ ] Publish example outputs and fixture snapshots
-- [ ] Add npm scripts for coverage and watch mode
-- [ ] Add a Dockerfile for quick local or cloud deployment
+- [x] Add npm scripts for coverage and watch mode
+- [x] Add a Dockerfile for quick local or cloud deployment
 - [ ] Write contribution guidelines and rule-design notes
