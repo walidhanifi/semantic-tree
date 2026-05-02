@@ -1,3 +1,5 @@
+import { renderPageHTML } from "./render.js";
+
 export class FetchError extends Error {
   status: number;
 
@@ -8,6 +10,8 @@ export class FetchError extends Error {
     Object.setPrototypeOf(this, FetchError.prototype);
   }
 }
+
+export type FetchMode = "static" | "rendered";
 
 /** Validates that a string is a well formed HTTP or HTTPS URL */
 export function isValidUrl(url: string): boolean {
@@ -20,7 +24,14 @@ export function isValidUrl(url: string): boolean {
 }
 
 /** Fetches HTML from a URL with timeout and content-type validation */
-export async function fetchHTML(url: string) {
+export async function fetchHTML(
+  url: string,
+  options: { mode?: FetchMode } = {},
+) {
+  if (options.mode === "rendered") {
+    return renderPageHTML(url);
+  }
+
   const response = await fetch(url, {
     signal: AbortSignal.timeout(10000),
   });

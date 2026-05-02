@@ -12,7 +12,7 @@ This repository is being developed as a focused HTML heading-audit tool. The ite
 
 ## Product Improvements
 
-- [ ] Support JavaScript-rendered pages via Playwright while keeping the core parser transport-agnostic
+- [x] Support JavaScript-rendered pages via Playwright while keeping the core parser transport-agnostic
 - [ ] Add request caching and basic rate limiting to the HTTP service
 - [ ] Expose a health endpoint and structured logs for deployment
 - [x] Add a simple HTML report mode for non-technical reviewers

@@ -20,6 +20,12 @@ npm install
 npm run build
 ```
 
+If you want rendered-page support locally, install the Chromium runtime once:
+
+```bash
+npm run playwright:install
+```
+
 Run the CLI against a page:
 
 ```bash
@@ -30,6 +36,12 @@ Render an HTML report from the CLI:
 
 ```bash
 node dist/cli.js https://www.bbc.com --report html > report.html
+```
+
+Render a JavaScript-heavy page before auditing it:
+
+```bash
+node dist/cli.js https://example.com/app --render js
 ```
 
 Run the HTTP API locally:
@@ -48,6 +60,12 @@ Or request the HTML report directly:
 
 ```text
 http://localhost:8000?u=https://www.bbc.com&format=html
+```
+
+For JavaScript-rendered pages:
+
+```text
+http://localhost:8000?u=https://example.com/app&render=js
 ```
 
 Run the test suite:
@@ -135,7 +153,7 @@ Overall complexity is `O(n x d)`.
 - Structural nesting is inferred from `section`, `article`, `nav`, `aside`, and `div`
 - The service currently audits one URL at a time with no persistence or caching
 
-For JavaScript-rendered pages, the next practical step is to swap the fetch/extraction layer to a headless browser such as Playwright while keeping the core audit logic unchanged.
+JavaScript-rendered pages can be fetched through Playwright with `--render js` in the CLI or `render=js` on the HTTP endpoint. Static fetching remains the default because it is faster and has fewer runtime requirements.
 
 ## Development Notes
 

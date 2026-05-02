@@ -1,4 +1,5 @@
 import express from "express";
+import type { FetchMode } from "./fetch.js";
 import { parseHTML } from "./index.js";
 import { FetchError, fetchHTML, isValidUrl } from "./fetch.js";
 import { renderHTMLReport } from "./report.js";
@@ -6,9 +7,14 @@ import { renderHTMLReport } from "./report.js";
 export const app = express();
 const port = parseInt(process.env.PORT || "8000", 10);
 
+function toFetchMode(renderQuery: unknown): FetchMode {
+  return renderQuery === "js" ? "rendered" : "static";
+}
+
 app.get("/", async (req, res) => {
   const url = req.query.u as string;
   const format = req.query.format === "html" ? "html" : "json";
+  const mode = toFetchMode(req.query.render);
 
   if (!url) {
     res.status(400).json({
@@ -28,7 +34,7 @@ app.get("/", async (req, res) => {
   }
 
   try {
-    const html = await fetchHTML(url);
+    const html = await fetchHTML(url, { mode });
     const result = parseHTML(html);
 
     if (format === "html") {

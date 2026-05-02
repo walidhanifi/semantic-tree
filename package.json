@@ -17,6 +17,7 @@
     "start": "node dist/server.js",
     "test": "vitest run",
     "cli": "node dist/cli.js",
+    "playwright:install": "playwright install chromium",
     "lint": "eslint src/",
     "format": "prettier --write src/",
     "format:check": "prettier --check src/"
@@ -61,7 +62,8 @@
   "type": "module",
   "dependencies": {
     "cheerio": "^1.2.0",
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "playwright": "^1.59.1"
   },
   "lint-staged": {
     "*.ts": [

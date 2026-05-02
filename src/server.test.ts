@@ -1,6 +1,12 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import request from "supertest";
+
+vi.mock("./render.js", () => ({
+  renderPageHTML: vi.fn(async () => "<main><h1>Rendered app</h1></main>"),
+}));
+
 import { app } from "./server.js";
+import { renderPageHTML } from "./render.js";
 
 afterEach(() => {
   vi.restoreAllMocks();
@@ -54,5 +60,15 @@ describe("server", () => {
     expect(response.headers["content-type"]).toContain("text/html");
     expect(response.text).toContain("Heading Audit Report");
     expect(response.text).toContain("https://example.com");
+  });
+
+  it("should accept rendered mode through the query string", async () => {
+    const response = await request(app).get(
+      "/?u=https://example.com&render=js",
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty("semantic-structure");
+    expect(renderPageHTML).toHaveBeenCalledWith("https://example.com");
   });
 });

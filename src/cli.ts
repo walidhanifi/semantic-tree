@@ -1,12 +1,19 @@
+import type { FetchMode } from "./fetch.js";
 import { FetchError, fetchHTML, isValidUrl } from "./fetch.js";
 import { parseHTML } from "./index.js";
 import { renderHTMLReport } from "./report.js";
 
 type ReportFormat = "json" | "html";
+type RenderMode = "static" | "js";
 
-function parseArgs(args: string[]): { url?: string; format: ReportFormat } {
+function parseArgs(args: string[]): {
+  url?: string;
+  format: ReportFormat;
+  renderMode: RenderMode;
+} {
   let url: string | undefined;
   let format: ReportFormat = "json";
+  let renderMode: RenderMode = "static";
 
   for (let index = 0; index < args.length; index += 1) {
     const arg = args[index];
@@ -21,19 +28,34 @@ function parseArgs(args: string[]): { url?: string; format: ReportFormat } {
       continue;
     }
 
+    if (arg === "--render") {
+      const value = args[index + 1];
+      if (value === "js") {
+        renderMode = value;
+        index += 1;
+      }
+      continue;
+    }
+
     if (!arg.startsWith("--") && !url) {
       url = arg;
     }
   }
 
-  return url ? { url, format } : { format };
+  return url ? { url, format, renderMode } : { format, renderMode };
+}
+
+function toFetchMode(renderMode: RenderMode): FetchMode {
+  return renderMode === "js" ? "rendered" : "static";
 }
 
 async function main() {
-  const { url, format } = parseArgs(process.argv.slice(2));
+  const { url, format, renderMode } = parseArgs(process.argv.slice(2));
 
   if (!url) {
-    console.error("Usage: heading-audit <url> [--report html|json]");
+    console.error(
+      "Usage: heading-audit <url> [--report html|json] [--render js]",
+    );
     process.exit(1);
   }
 
@@ -43,7 +65,7 @@ async function main() {
   }
 
   try {
-    const html = await fetchHTML(url);
+    const html = await fetchHTML(url, { mode: toFetchMode(renderMode) });
     const result = parseHTML(html);
 
     if (format === "html") {
